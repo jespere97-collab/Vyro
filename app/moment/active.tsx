@@ -1,21 +1,21 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Typography, Spacing, Radius } from '../../src/constants/theme';
 import { useMoment } from '../../src/context/MomentContext';
 import { CountdownTimer } from '../../src/components/moment/CountdownTimer';
-import { ParticipantsList } from '../../src/components/moment/ParticipantsList';
-import { QRJoinCard } from '../../src/components/moment/QRJoinCard';
-import { Button } from '../../src/components/ui/Button';
+import { GroupMembersList } from '../../src/components/moment/GroupMembersList';
+import { ConfirmModal } from '../../src/components/ui/ConfirmModal';
 import { CATEGORY_PRESETS } from '../../src/constants/presets';
+import { Button } from '../../src/components/ui/Button';
 
 export default function ActiveMomentScreen() {
   const router = useRouter();
   const { state, endMoment, remainingMs } = useMoment();
-  const { active, joinCode } = state;
+  const { active } = state;
+  const [showEndConfirm, setShowEndConfirm] = useState(false);
 
-  // If no active moment, go back
   if (!active) {
     return (
       <SafeAreaView style={styles.safe}>
@@ -29,59 +29,70 @@ export default function ActiveMomentScreen() {
 
   const preset = CATEGORY_PRESETS.find((p) => p.category === active.category);
   const isTimerDone = remainingMs <= 0;
+  const enabledAppsCount = active.allowedApps.filter((a) => a.enabled).length;
 
-  const handleEnd = () => {
+  const handleEndPress = () => {
+    if (isTimerDone) {
+      endMoment(0);
+      router.replace('/moment/share');
+    } else {
+      setShowEndConfirm(true);
+    }
+  };
+
+  const handleConfirmEnd = () => {
+    setShowEndConfirm(false);
     endMoment(0);
     router.replace('/moment/share');
   };
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <View style={styles.container}>
-        {/* Moment info */}
-        <View style={styles.header}>
-          <Text style={styles.emoji}>{preset?.emoji ?? '✨'}</Text>
-          <Text style={styles.title}>{active.title || preset?.label || 'Moment'}</Text>
-          <View style={styles.typeBadge}>
-            <Text style={styles.typeText}>
-              {active.type === 'solo' ? 'Solo' : 'Group'}
-            </Text>
-          </View>
-        </View>
+        {/* Title */}
+        <Text style={styles.title}>{active.title || preset?.label || 'Moment'}</Text>
+        <Text style={styles.tagline}>Turn moments into memories</Text>
 
-        {/* Timer */}
-        <CountdownTimer remainingMs={remainingMs} label="Time Left" />
+        {/* Giant countdown */}
+        <CountdownTimer remainingMs={remainingMs} />
 
-        {/* Status message */}
-        <View style={styles.statusCard}>
-          <Text style={styles.statusText}>
-            {isTimerDone
-              ? 'Time is up! Great job being present.'
-              : 'Put your phone down and enjoy the moment.'}
-          </Text>
-        </View>
-
-        {/* Participants */}
-        {active.type === 'group' && (
-          <ParticipantsList participants={active.participants} />
-        )}
-
-        {/* QR code for group */}
-        {active.type === 'group' && joinCode ? (
-          <QRJoinCard code={joinCode} />
+        {/* Show QR Code button */}
+        {active.type === 'group' ? (
+          <TouchableOpacity style={styles.qrButton} activeOpacity={0.7}>
+            <Text style={styles.qrButtonText}>Show QR Code</Text>
+          </TouchableOpacity>
         ) : null}
 
-        {/* End button */}
-        <View style={styles.bottomActions}>
-          <Button
-            title={isTimerDone ? 'See Summary' : 'End Moment'}
-            onPress={handleEnd}
-            fullWidth
-            size="lg"
-            variant={isTimerDone ? 'primary' : 'outline'}
-          />
-        </View>
+        {/* Group members */}
+        {active.type === 'group' ? (
+          <GroupMembersList participants={active.participants} />
+        ) : null}
+
+        {/* Allowed Apps pill */}
+        <TouchableOpacity style={styles.pill} activeOpacity={0.7}>
+          <Text style={styles.pillText}>Allowed Apps ({enabledAppsCount})</Text>
+        </TouchableOpacity>
+
+        {/* Spacer */}
+        <View style={styles.spacer} />
+
+        {/* End Moment button */}
+        <TouchableOpacity style={styles.endButton} onPress={handleEndPress} activeOpacity={0.7}>
+          <Text style={styles.endButtonText}>End Moment</Text>
+        </TouchableOpacity>
       </View>
+
+      {/* Confirmation modal */}
+      <ConfirmModal
+        visible={showEndConfirm}
+        title="End this moment?"
+        message={"Your moment still has time remaining.\nOther participants will be notified."}
+        confirmLabel="Leave"
+        cancelLabel="Stay"
+        confirmDestructive
+        onConfirm={handleConfirmEnd}
+        onCancel={() => setShowEndConfirm(false)}
+      />
     </SafeAreaView>
   );
 }
@@ -93,7 +104,9 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    padding: Spacing.xxl,
+    alignItems: 'center',
+    paddingHorizontal: Spacing.xxl,
+    paddingTop: Spacing.xxxl,
   },
   centered: {
     flex: 1,
@@ -107,47 +120,59 @@ const styles = StyleSheet.create({
   },
 
   // Header
-  header: {
-    alignItems: 'center',
-    marginTop: Spacing.xl,
-  },
-  emoji: {
-    fontSize: 48,
-    marginBottom: Spacing.md,
-  },
   title: {
-    ...Typography.h1,
-    color: Colors.textPrimary,
+    fontSize: 36,
+    fontWeight: '800',
+    color: Colors.primary,
+    marginBottom: Spacing.xs,
+  },
+  tagline: {
+    ...Typography.caption,
+    color: Colors.textSecondary,
     marginBottom: Spacing.sm,
   },
-  typeBadge: {
-    backgroundColor: Colors.chipDefault,
-    paddingVertical: Spacing.xs,
-    paddingHorizontal: Spacing.lg,
-    borderRadius: Radius.full,
-  },
-  typeText: {
-    ...Typography.captionBold,
-    color: Colors.textSecondary,
-  },
 
-  // Status
-  statusCard: {
-    backgroundColor: Colors.surface,
-    borderRadius: Radius.xl,
-    padding: Spacing.xl,
-    alignItems: 'center',
+  // QR button
+  qrButton: {
+    backgroundColor: Colors.chipDefault,
+    borderRadius: Radius.full,
+    paddingVertical: 12,
+    paddingHorizontal: 28,
     marginBottom: Spacing.xxl,
   },
-  statusText: {
-    ...Typography.body,
-    color: Colors.textSecondary,
-    textAlign: 'center',
+  qrButtonText: {
+    ...Typography.bodyBold,
+    color: Colors.textPrimary,
   },
 
-  // Bottom
-  bottomActions: {
-    marginTop: 'auto',
-    paddingBottom: Spacing.lg,
+  // Allowed apps pill
+  pill: {
+    backgroundColor: Colors.chipDefault,
+    borderRadius: Radius.full,
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+    marginTop: Spacing.sm,
+  },
+  pillText: {
+    ...Typography.bodyBold,
+    color: Colors.textPrimary,
+  },
+
+  spacer: {
+    flex: 1,
+  },
+
+  // End button
+  endButton: {
+    backgroundColor: Colors.chipDefault,
+    borderRadius: Radius.full,
+    paddingVertical: 14,
+    paddingHorizontal: 40,
+    marginBottom: Spacing.xxxl,
+  },
+  endButtonText: {
+    ...Typography.bodyBold,
+    color: Colors.primary,
+    fontSize: 18,
   },
 });

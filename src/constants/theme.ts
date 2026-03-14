@@ -2,7 +2,7 @@ export const Colors = {
   // Primary palette — warm, calm, earthy
   background: '#F5F0EB',
   surface: '#FFFFFF',
-  surfaceAlt: '#F9F6F2',
+  surfaceAlt: '#F0EBE4',
   card: '#FFFFFF',
 
   // Brown accent spectrum
@@ -12,29 +12,33 @@ export const Colors = {
   primaryMuted: '#C4A88C',
 
   // Text
-  textPrimary: '#2D2017',
-  textSecondary: '#7A6B5D',
-  textTertiary: '#A89888',
+  textPrimary: '#6B4C3B',
+  textSecondary: '#9A8A7C',
+  textTertiary: '#B8A99A',
   textInverse: '#FFFFFF',
 
   // Accent / Status
   accent: '#D4A574',
   success: '#5E9E6B',
   warning: '#D4944A',
-  error: '#C45B4A',
+  error: '#D94444',
 
   // UI
   border: '#E8E0D6',
   borderLight: '#F0EAE2',
   divider: '#EDE7DF',
-  overlay: 'rgba(45, 32, 23, 0.5)',
+  overlay: 'rgba(45, 32, 23, 0.4)',
   shadow: 'rgba(107, 76, 59, 0.08)',
 
   // Chip states
-  chipDefault: '#F0EAE2',
+  chipDefault: '#E8E0D6',
   chipSelected: '#6B4C3B',
   chipText: '#7A6B5D',
   chipTextSelected: '#FFFFFF',
+
+  // Input
+  inputBackground: '#F0EBE4',
+  inputBorder: '#E8E0D6',
 } as const;
 
 export const Typography = {
@@ -85,11 +89,17 @@ export const Typography = {
     fontWeight: '400' as const,
     lineHeight: 16,
   },
+  /** Section labels like TITLE, DURATION, TYPE */
+  sectionLabel: {
+    fontSize: 14,
+    fontWeight: '700' as const,
+    lineHeight: 18,
+    letterSpacing: 1,
+  },
   timer: {
-    fontSize: 64,
-    fontWeight: '300' as const,
-    lineHeight: 72,
-    letterSpacing: 2,
+    fontSize: 72,
+    fontWeight: '800' as const,
+    lineHeight: 80,
   },
 } as const;
 

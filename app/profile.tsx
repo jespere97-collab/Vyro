@@ -1,11 +1,12 @@
 import React from 'react';
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Colors, Typography, Spacing, Radius } from '../../src/constants/theme';
-import { useMoment } from '../../src/context/MomentContext';
-import { formatDurationLabel } from '../../src/utils/time';
+import { Colors, Typography, Spacing, Radius } from '../src/constants/theme';
+import { useMoment } from '../src/context/MomentContext';
 
 export default function ProfileScreen() {
+  const router = useRouter();
   const { state } = useMoment();
 
   const totalMoments = state.history.length;
@@ -19,7 +20,11 @@ export default function ProfileScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
+        {/* Back */}
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <Text style={styles.backText}>{'<-'}</Text>
+        </TouchableOpacity>
+
         <Text style={styles.title}>Profile</Text>
 
         {/* Avatar */}
@@ -55,24 +60,13 @@ export default function ProfileScreen() {
           </View>
         </View>
 
-        {/* Streak */}
-        <View style={styles.streakCard}>
-          <Text style={styles.streakEmoji}>🔥</Text>
-          <View style={styles.streakInfo}>
-            <Text style={styles.streakTitle}>Current Streak</Text>
-            <Text style={styles.streakValue}>
-              {totalMoments > 0 ? `${Math.min(totalMoments, 7)} days` : 'Start your streak!'}
-            </Text>
-          </View>
-        </View>
-
-        {/* Settings placeholder */}
+        {/* Settings */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Settings</Text>
           {['Notifications', 'Privacy', 'About Vyro', 'Help & Support'].map((item) => (
             <View key={item} style={styles.settingsItem}>
               <Text style={styles.settingsText}>{item}</Text>
-              <Text style={styles.settingsArrow}>›</Text>
+              <Text style={styles.settingsArrow}>{'>'}</Text>
             </View>
           ))}
         </View>
@@ -93,13 +87,19 @@ const styles = StyleSheet.create({
     padding: Spacing.xxl,
     paddingBottom: Spacing.huge,
   },
+  backButton: {
+    marginBottom: Spacing.lg,
+  },
+  backText: {
+    fontSize: 22,
+    color: Colors.primary,
+    fontWeight: '300',
+  },
   title: {
     ...Typography.h1,
     color: Colors.textPrimary,
     marginBottom: Spacing.xxl,
   },
-
-  // Avatar
   avatarSection: {
     alignItems: 'center',
     marginBottom: Spacing.xxxl,
@@ -127,14 +127,12 @@ const styles = StyleSheet.create({
     color: Colors.textTertiary,
     marginTop: Spacing.xs,
   },
-
-  // Stats
   statsCard: {
     flexDirection: 'row',
     backgroundColor: Colors.surface,
     borderRadius: Radius.xxl,
     padding: Spacing.xxl,
-    marginBottom: Spacing.lg,
+    marginBottom: Spacing.xxxl,
     shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 1,
@@ -163,41 +161,6 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
-
-  // Streak
-  streakCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.surface,
-    borderRadius: Radius.xxl,
-    padding: Spacing.xxl,
-    marginBottom: Spacing.xxxl,
-    shadowColor: Colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 1,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  streakEmoji: {
-    fontSize: 36,
-    marginRight: Spacing.lg,
-  },
-  streakInfo: {
-    flex: 1,
-  },
-  streakTitle: {
-    ...Typography.captionBold,
-    color: Colors.textSecondary,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  streakValue: {
-    ...Typography.h3,
-    color: Colors.textPrimary,
-    marginTop: Spacing.xs,
-  },
-
-  // Settings
   section: {
     marginTop: Spacing.lg,
   },
@@ -220,7 +183,7 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
   },
   settingsArrow: {
-    fontSize: 20,
+    fontSize: 18,
     color: Colors.textTertiary,
   },
 });

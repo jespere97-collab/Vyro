@@ -5,7 +5,6 @@ import {
   CompletedMoment,
   MomentCategory,
   MomentType,
-  AllowedApp,
 } from '../types/moment';
 import { CATEGORY_PRESETS, DEFAULT_ALLOWED_APPS } from '../constants/presets';
 import { generateMomentCode } from '../utils/time';
@@ -13,13 +12,9 @@ import { generateMomentCode } from '../utils/time';
 // ── State ──────────────────────────────────────────────────────────────────
 
 interface MomentState {
-  /** Draft being configured before start */
   draft: MomentConfig;
-  /** Currently running moment */
   active: ActiveMoment | null;
-  /** History of completed moments */
   history: CompletedMoment[];
-  /** Join code for group moments */
   joinCode: string | null;
 }
 
@@ -86,11 +81,22 @@ function reducer(state: MomentState, action: Action): MomentState {
     case 'START_MOMENT': {
       const now = Date.now();
       const code = state.draft.type === 'group' ? generateMomentCode() : null;
+      // Add default group participants for demo purposes
+      const participants =
+        state.draft.type === 'group'
+          ? [
+              { id: 'you', name: 'You', isHost: true, phoneUsed: false },
+              { id: 'alex', name: 'Alex', isHost: false, phoneUsed: false },
+              { id: 'jordan', name: 'Jordan', isHost: false, phoneUsed: false },
+              { id: 'sam', name: 'Sam', isHost: false, phoneUsed: false },
+            ]
+          : [{ id: 'you', name: 'You', isHost: true, phoneUsed: false }];
       return {
         ...state,
         active: {
           ...state.draft,
           id: `moment_${now}`,
+          participants,
           startedAt: now,
           endsAt: now + state.draft.durationMinutes * 60 * 1000,
           isPaused: false,
@@ -104,7 +110,7 @@ function reducer(state: MomentState, action: Action): MomentState {
         ...state.active,
         endedAt: Date.now(),
         phonesUsed: action.phonesUsed,
-        totalParticipants: Math.max(state.active.participants.length, 1),
+        totalParticipants: state.active.participants.length,
       };
       return {
         ...state,
@@ -135,7 +141,6 @@ interface MomentContextValue {
   startMoment: () => void;
   endMoment: (phonesUsed?: number) => void;
   resetDraft: () => void;
-  /** Remaining ms for active moment (ticks every second) */
   remainingMs: number;
 }
 
@@ -146,7 +151,6 @@ export function MomentProvider({ children }: { children: React.ReactNode }) {
   const [remainingMs, setRemainingMs] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Countdown timer for active moment
   useEffect(() => {
     if (state.active) {
       const tick = () => {

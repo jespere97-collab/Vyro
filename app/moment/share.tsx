@@ -5,7 +5,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Spacing } from '../../src/constants/theme';
 import { useMoment } from '../../src/context/MomentContext';
 import { ShareCard } from '../../src/components/moment/ShareCard';
-import { Button } from '../../src/components/ui/Button';
 
 export default function ShareMomentScreen() {
   const router = useRouter();
@@ -19,8 +18,7 @@ export default function ShareMomentScreen() {
   };
 
   const handleShare = () => {
-    // In a real app, this would open the native share sheet
-    // Share.share({ message: '...' })
+    // In production: Share.share({ message: '...' })
   };
 
   if (!lastMoment) {

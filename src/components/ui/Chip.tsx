@@ -6,17 +6,15 @@ interface ChipProps {
   label: string;
   selected?: boolean;
   onPress?: () => void;
-  emoji?: string;
 }
 
-export function Chip({ label, selected = false, onPress, emoji }: ChipProps) {
+export function Chip({ label, selected = false, onPress }: ChipProps) {
   return (
     <TouchableOpacity
       onPress={onPress}
       activeOpacity={0.7}
       style={[styles.chip, selected && styles.chipSelected]}
     >
-      {emoji ? <Text style={styles.emoji}>{emoji}</Text> : null}
       <Text style={[styles.label, selected && styles.labelSelected]}>{label}</Text>
     </TouchableOpacity>
   );
@@ -24,24 +22,18 @@ export function Chip({ label, selected = false, onPress, emoji }: ChipProps) {
 
 const styles = StyleSheet.create({
   chip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: Spacing.sm + 2,
-    paddingHorizontal: Spacing.lg,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
     borderRadius: Radius.full,
     backgroundColor: Colors.chipDefault,
     marginRight: Spacing.sm,
-    marginBottom: Spacing.sm,
+    marginBottom: Spacing.sm + 2,
   },
   chipSelected: {
     backgroundColor: Colors.chipSelected,
   },
-  emoji: {
-    fontSize: 16,
-    marginRight: Spacing.xs + 2,
-  },
   label: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '500',
     color: Colors.chipText,
   },

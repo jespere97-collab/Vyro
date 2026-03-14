@@ -21,7 +21,6 @@ export function ShareCard({ moment, onShare, onDone }: ShareCardProps) {
         <Text style={styles.badgeText}>Moment Complete</Text>
       </View>
 
-      <Text style={styles.emoji}>{preset?.emoji ?? '✨'}</Text>
       <Text style={styles.title}>{moment.title || preset?.label || 'Moment'}</Text>
 
       <View style={styles.divider} />
@@ -99,10 +98,6 @@ const styles = StyleSheet.create({
     color: Colors.textInverse,
     textTransform: 'uppercase',
     letterSpacing: 1,
-  },
-  emoji: {
-    fontSize: 48,
-    marginBottom: Spacing.md,
   },
   title: {
     ...Typography.h1,

@@ -15,7 +15,6 @@ export function MomentCard({ moment }: MomentCardProps) {
   return (
     <View style={styles.card}>
       <View style={styles.header}>
-        <Text style={styles.emoji}>{preset?.emoji ?? '✨'}</Text>
         <Text style={styles.title}>{moment.title || preset?.label || 'Moment'}</Text>
       </View>
       <View style={styles.statsRow}>
@@ -64,10 +63,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: Spacing.xl,
-  },
-  emoji: {
-    fontSize: 28,
-    marginRight: Spacing.md,
   },
   title: {
     ...Typography.h2,

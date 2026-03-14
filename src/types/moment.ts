@@ -1,14 +1,14 @@
 export type MomentCategory =
   | 'dinner'
+  | 'party'
+  | 'concert'
+  | 'movie'
   | 'date'
   | 'study'
-  | 'walk'
-  | 'workout'
-  | 'meditate'
-  | 'movie'
-  | 'concert'
   | 'work'
-  | 'party'
+  | 'workout'
+  | 'walk'
+  | 'meditate'
   | 'custom';
 
 export type MomentType = 'solo' | 'group';
@@ -23,7 +23,7 @@ export interface AllowedApp {
 export interface Participant {
   id: string;
   name: string;
-  avatar?: string;
+  isHost?: boolean;
   phoneUsed: boolean;
 }
 
@@ -53,7 +53,6 @@ export interface CompletedMoment extends MomentConfig {
 export interface CategoryPreset {
   category: MomentCategory;
   label: string;
-  emoji: string;
   defaultDuration: number;
   defaultType: MomentType;
 }

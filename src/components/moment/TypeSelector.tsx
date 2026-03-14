@@ -1,9 +1,8 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { Chip } from '../ui/Chip';
-import { SectionHeader } from '../ui/SectionHeader';
 import { MomentType } from '../../types/moment';
-import { Spacing } from '../../constants/theme';
+import { Colors, Typography, Spacing } from '../../constants/theme';
 
 interface TypeSelectorProps {
   selected: MomentType;
@@ -12,21 +11,28 @@ interface TypeSelectorProps {
 
 export function TypeSelector({ selected, onSelect }: TypeSelectorProps) {
   return (
-    <View style={styles.container}>
-      <SectionHeader title="Solo or group?" />
+    <View>
       <View style={styles.row}>
         <Chip label="Solo" selected={selected === 'solo'} onPress={() => onSelect('solo')} />
         <Chip label="Group" selected={selected === 'group'} onPress={() => onSelect('group')} />
       </View>
+      {selected === 'group' ? (
+        <Text style={styles.helper}>
+          A QR code will be generated so others can join your session.
+        </Text>
+      ) : null}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    marginBottom: Spacing.xxl,
-  },
   row: {
     flexDirection: 'row',
+  },
+  helper: {
+    ...Typography.caption,
+    color: Colors.textSecondary,
+    marginTop: Spacing.sm,
+    lineHeight: 20,
   },
 });
